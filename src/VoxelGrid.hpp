@@ -67,6 +67,13 @@ public:
   void
   AddPoint(Point point)
   {
+    assert(point.x > -Specification::DepthI
+        && point.x < +Specification::DepthI);
+    assert(point.y > -Specification::DepthJ
+        && point.y < +Specification::DepthJ);
+    assert(point.z > -Specification::DepthK
+        && point.z < +Specification::DepthK);
+
     auto index = MapPoint(point);
     data[index].points.emplace_back(
                         PointGlobalToPointLocal(index, point));

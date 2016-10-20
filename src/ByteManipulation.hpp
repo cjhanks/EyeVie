@@ -69,10 +69,10 @@ struct TypeFor_<16> { using type = std::uint128_t; };
 
 /// {
 /// Compute the required underlying type of the index value.
-template <std::size_t Size>
+template <std::size_t BitLength_>
 struct TypeFor {
-  static constexpr std::size_t BitLength = BitsRequired<Size>::value;
-  static constexpr std::size_t ByteLength = BytesRequired<BitLength>::value;
+  static constexpr std::size_t BitLength = BitLength_;
+  static constexpr std::size_t ByteLength = std::ceil(BitLength / 8);
 
   using type = typename TypeFor_<ByteLength>::type;
 };

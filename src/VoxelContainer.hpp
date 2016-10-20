@@ -23,6 +23,7 @@ public:
   using PointAccessor = detail::PointAccessor<SelfType>;
   using VoxelNeighborhood = detail::VoxelNeighborhood<SelfType>;
 
+
 private:
   using Map = std::unordered_map<
                     VoxelIndex,
@@ -38,31 +39,31 @@ public:
   // {
   ValueType&
   at(Point point)
-  { return data.at(MapPoint(point)); }
+  { return data.at(this->MapPoint(point)); }
 
   const ValueType&
   at(Point point) const
-  { return data.at(MapPoint(point)); }
+  { return data.at(this->MapPoint(point)); }
   // }
 
   // {
   ValueType&
   operator[](Point point)
-  { return data[MapPoint(point)]; }
+  { return data[this->MapPoint(point)]; }
 
   const ValueType&
   operator[](Point point) const
-  { return data[MapPoint(point)]; }
+  { return data[this->MapPoint(point)]; }
   // }
 
   //{
   iterator
   find(Point point)
-  { return data.find(MapPoint(point)); }
+  { return data.find(this->MapPoint(point)); }
 
   const_iterator
   find(Point point) const
-  { return data.find(MapPoint(point)); }
+  { return data.find(this->MapPoint(point)); }
   //}
 
   // {
@@ -82,6 +83,28 @@ public:
   end() const
   { return data.end(); }
   // }
+
+  // {
+  size_t
+  Size() const
+  { return data.size(); }
+
+  size_t
+  size() const
+  { return data.size(); }
+  // }
+
+  template <typename Predicate>
+  void
+  Filter(Predicate predicate)
+  {
+    for (auto iter = begin(); iter != end(); /**/) {
+      if (predicate(iter->second))
+        iter = data.erase(iter);
+      else
+        ++iter;
+    }
+  }
 
  private:
     Map data;
