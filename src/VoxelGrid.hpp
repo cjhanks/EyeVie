@@ -100,7 +100,7 @@ public:
     return MapPointImpl(x, y, z);
   }
 
-private:
+protected:
   const Specification specification;
   std::unordered_map<
         VoxelIndex,
