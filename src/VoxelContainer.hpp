@@ -7,10 +7,10 @@
 
 
 namespace IV {
-template <typename Specification_, typename ValueType>
+template <typename VoxelGridIndexMapper_, typename ValueType>
 class VoxelContainer {
-  using Specification = Specification_;
-  using VoxelGridIndexMapper = IV::VoxelGridIndexMapper<Specification>;
+  using VoxelGridIndexMapper = VoxelGridIndexMapper_;
+  using Specification = typename VoxelGridIndexMapper::Specification;
   using VoxelTraits = typename Specification::VoxelTraits;
   using VoxelIndex = typename VoxelTraits::Index;
 
@@ -27,34 +27,39 @@ public:
   using iterator = typename Map::iterator;
   using const_iterator = typename Map::const_iterator;
 
+  VoxelContainer() = default;
+  explicit VoxelContainer(VoxelGridIndexMapper mapper)
+    : mapper(mapper)
+  {}
+
   // {
   ValueType&
   at(Point point)
-  { return data.at(VoxelGridIndexMapper::MapPoint(point)); }
+  { return data.at(mapper.MapPoint(point)); }
 
   const ValueType&
   at(Point point) const
-  { return data.at(VoxelGridIndexMapper::MapPoint(point)); }
+  { return data.at(mapper.MapPoint(point)); }
   // }
 
   // {
   ValueType&
   operator[](Point point)
-  { return data[VoxelGridIndexMapper::MapPoint(point)]; }
+  { return data[mapper.MapPoint(point)]; }
 
   const ValueType&
   operator[](Point point) const
-  { return data[VoxelGridIndexMapper::MapPoint(point)]; }
+  { return data[mapper.MapPoint(point)]; }
   // }
 
   //{
   iterator
   find(Point point)
-  { return data.find(VoxelGridIndexMapper::MapPoint(point)); }
+  { return data.find(mapper.MapPoint(point)); }
 
   const_iterator
   find(Point point) const
-  { return data.find(VoxelGridIndexMapper::MapPoint(point)); }
+  { return data.find(mapper.MapPoint(point)); }
   //}
 
   // {
@@ -98,6 +103,7 @@ public:
   }
 
  private:
+    VoxelGridIndexMapper mapper;
     Map data;
 };
 } // ns IV

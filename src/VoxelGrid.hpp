@@ -59,9 +59,8 @@ struct VoxelSpecifications {
 ///
 template <typename Specification_>
 class VoxelGridIndexMapper {
-  using Specification = Specification_;
-
 public:
+  using Specification = Specification_;
   using PointTraits = typename Specification::PointTraits;
   using Scalar = typename PointTraits::Scalar;
   using Point = typename PointTraits::Point;
@@ -69,23 +68,22 @@ public:
   using VoxelTraits = typename Specification::VoxelTraits;
   using VoxelIndex = typename VoxelTraits::Index;
 
-
   // {
   // Maps a point to a specific voxel index. If the requested point would
   // overflow an `out_of_range` error is thrown when NDEBUG is not defined.
   // If NDEBUG is defined, overflow behavior is undefined.
-  inline static VoxelIndex
-  MapPoint(Point point)
+  inline VoxelIndex
+  MapPoint(Point point) const
   { return MapPoint(point.x, point.y, point.z); }
 
-  inline static VoxelIndex
-  MapPoint(Scalar x, Scalar y, Scalar z)
+  inline VoxelIndex
+  MapPoint(Scalar x, Scalar y, Scalar z) const
   { return MapPointImpl(x, y, z); }
   // }
 
 private:
-  inline static VoxelIndex
-  MapPointImpl(Scalar x, Scalar y, Scalar z)
+  inline VoxelIndex
+  MapPointImpl(Scalar x, Scalar y, Scalar z) const
   {
     auto indexI = std::floor(x);
     auto indexJ = std::floor(y);
