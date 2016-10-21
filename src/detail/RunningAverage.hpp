@@ -1,6 +1,9 @@
 #ifndef RUNNING_AVERAGE_H_
 #define RUNNING_AVERAGE_H_
 
+#include <cmath>
+
+
 namespace IV { namespace detail {
 template <typename Scalar>
 class RunningAverage {

@@ -9,9 +9,11 @@
 namespace IV {
 template <typename Specification>
 class CentroidPoint {
+  using PointTraits = typename Specification::PointTraits;
+
 public:
-  using Point = typename Specification::Point;
-  using Scalar = typename Specification::Scalar;
+  using Point = typename PointTraits::Point;
+  using Scalar = typename PointTraits::Scalar;
 
   void
   Update(Point point)

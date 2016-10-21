@@ -5,15 +5,16 @@
 #define BYTE_MANIPULATION_HPP_
 
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <cstdint>
 
 
 namespace IV { namespace detail {
 /// {
-/// At compile time recursively identify the number of bits required to fulfill
-/// some number `Size`.  Increment the `Shift` operator until the value of
-/// `Size` is 0.
+/// At compile time recursively identify the number of bits required to
+/// fulfill /// some number `Size`.  Increment the `Shift` operator until
+/// the value of `Size` is 0.
 template <std::size_t Size, std::size_t Shift>
 struct BitsRequired_ {
   static constexpr std::size_t value =
@@ -36,7 +37,8 @@ struct BitsRequired {
 /// Given some number of bits, find the minimum bytes it would require.
 template <std::size_t BitSize>
 struct BytesRequired {
-  static constexpr std::size_t value = BitSize / 8 + !!(BitSize % 8);
+  static constexpr std::size_t value =
+            std::floor(BitSize / 8) + !!(BitSize % 8);
 };
 /// }
 
@@ -72,7 +74,7 @@ struct TypeFor_<16> { using type = std::uint128_t; };
 template <std::size_t BitLength_>
 struct TypeFor {
   static constexpr std::size_t BitLength = BitLength_;
-  static constexpr std::size_t ByteLength = std::ceil(BitLength / 8);
+  static constexpr std::size_t ByteLength = std::ceil(BitLength / 8.0);
 
   using type = typename TypeFor_<ByteLength>::type;
 };
