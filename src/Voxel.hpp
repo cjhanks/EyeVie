@@ -8,6 +8,15 @@
 
 
 namespace IV { namespace detail {
+/// {
+/// @struct IJK_Bits
+/// If the dimensions of the I, J, and K do not fit perfectly into an integer
+/// boundary (8, 16, 32...) there are some undefined bits which need to be
+/// diligantly initialized to 0.
+///
+/// However, when they *do* perfectly fit onto the boundary usage of
+/// `long undefined:0` is ill formed C++ code.  This code works around that
+/// issue with a specialization.
 template <
   std::size_t BitsI,
   std::size_t BitsJ,
@@ -44,6 +53,7 @@ struct IJK_Bits<BitsI, BitsJ, BitsK, 0> {
   long j:BitsJ;
   long k:BitsK;
 };
+/// }
 
 /// {
 /// @class VoxelIndex
@@ -87,7 +97,7 @@ struct VoxelIndex {
     : ijk(i, j, k)
   {}
 
-  VoxelIndex(IndexType id)
+  explicit VoxelIndex(IndexType id)
     : id(id)
   {}
 
@@ -100,14 +110,7 @@ struct VoxelIndex {
   // { Data elements
   union {
     IJK_Bits ijk;
-    //struct {
-    //  long i:BitsI;
-    //  long j:BitsJ;
-    //  long k:BitsK;
-    //  long undefined:BitsUndefined;
-    //} __attribute__((packed));
-
-   IndexType id;
+    IndexType id;
   };
   // }
 };
