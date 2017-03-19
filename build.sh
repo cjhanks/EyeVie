@@ -7,6 +7,7 @@ g++ \
   -std=c++14 \
   -Wall \
   -Wextra \
+  -Wno-deprecated-declarations \
   -IIV \
   -I/usr/include/eigen3 \
   test/*.cpp \
