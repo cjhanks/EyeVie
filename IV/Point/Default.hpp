@@ -2,7 +2,9 @@
 #define IV_POINT_HPP_
 
 namespace IV {
-struct DefaultPointData {};
+template <typename Specification>
+struct DefaultPointData {
+};
 
 struct DefaultPoint {
   using Number = float;

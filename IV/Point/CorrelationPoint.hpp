@@ -35,7 +35,7 @@ public:
     // -
     auto cxx = xy.CovarianceII();
     auto cxy = xy.CovarianceIJ();
-    auto cxz = xz.CovarianceJJ();
+    auto cxz = xz.CovarianceIJ();
 
     // -
     auto cyx = cxy;

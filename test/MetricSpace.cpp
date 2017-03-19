@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "MetricSpace.hpp"
+#include "Specification.hpp"
+#include "Quantization.hpp"
+
 #include <glog/logging.h>
 
 
