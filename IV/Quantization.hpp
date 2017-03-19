@@ -77,6 +77,24 @@ public:
     return point;
   }
   // }
+
+  // {
+  Number
+  QuantizationX() const { return quantizationX; }
+
+  Number
+  QuantizationY() const { return quantizationY; }
+
+  Number
+  QuantizationZ() const { return quantizationZ; }
+  // }
+
+  Point
+  Corner(Point point) const
+  {
+    return UnmapIndex(MapPoint(point));
+  }
+
 private:
   /// {
   /// The decimation/quantization of values along the integer space defined by

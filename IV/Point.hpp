@@ -3,6 +3,7 @@
 
 #include "Point/Centroid.hpp"
 #include "Point/Default.hpp"
+#include "Point/OccupancyPoint.hpp"
 
 #ifdef HAS_EIGEN3
   #include "Point/CorrelationPoint.hpp"

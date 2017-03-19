@@ -1,7 +1,7 @@
 CXX=g++
 CPPFLAGS=
 #CXXFLAGS=-O3 -Wall -Wextra -Werror -flto -std=c++14 -g -DNDEBUG -Wno-deprecated-declarations -I/usr/include/eigen3 -IIV
-CXXFLAGS=-Wall -Wextra -Werror -std=c++14 -g -Wno-deprecated-declarations -I/usr/include/eigen3 -IIV
+CXXFLAGS=-Wall -O1 -Wextra -Werror -std=c++14 -g -Wno-deprecated-declarations -I/usr/include/eigen3 -IIV
 LDFLAGS=-g -lglog
 
 %.o: %.cpp
@@ -13,7 +13,8 @@ TESTING_SOURCES = \
 	test/MetricSpace.cpp \
 	test/RunningRegression.cpp \
 	test/Voxel.cpp \
-	test/Static.cpp
+	test/Static.cpp \
+	test/OccupancyPoint.cpp
 
 TESTING_OBJECTS = $(subst .cpp,.o,$(TESTING_SOURCES))
 
