@@ -1,13 +1,9 @@
 #include <gtest/gtest.h>
-#include <type_traits>
+
+#include "Voxel.hpp"
 
 
-#include "detail/ByteManipulation.hpp"
-
-
-using std::vector;
-
-TEST(ByteManipulation, Bits) {
+TEST(Voxel, Bits) {
   using namespace IV::detail;
 
   ASSERT_EQ(size_t(BitsRequired<1 << 0>::value), 0 + 1);
@@ -22,7 +18,7 @@ TEST(ByteManipulation, Bits) {
   ASSERT_EQ(size_t(BitsRequired<1 << 9>::value), 9 + 1);
 }
 
-TEST(ByteManipulation, Bytes) {
+TEST(Voxel, Bytes) {
   using namespace IV::detail;
 
   ASSERT_EQ(size_t(BytesRequired<0>::value), 0);
@@ -43,7 +39,7 @@ TEST(ByteManipulation, Bytes) {
   ASSERT_EQ(size_t(BytesRequired<65>::value), 9);
 }
 
-TEST(ByteManipulation, Types) {
+TEST(Voxel, Types) {
   using namespace IV::detail;
 
   ASSERT_TRUE((std::is_same<TypeFor<0>::type, std::uint8_t>::value));
@@ -54,4 +50,12 @@ TEST(ByteManipulation, Types) {
   ASSERT_TRUE((std::is_same<TypeFor<32>::type, std::uint32_t>::value));
   ASSERT_TRUE((std::is_same<TypeFor<33>::type, std::uint64_t>::value));
   ASSERT_TRUE((std::is_same<TypeFor<64>::type, std::uint64_t>::value));
+}
+
+TEST(Voxel, Hashing) {
+  using namespace IV;
+  using VoxelIndex = IV::VoxelIndex<10, 10, 10>;
+
+  VoxelIndex index(0, 0, 0);
+  ASSERT_EQ(0, index.id);
 }
