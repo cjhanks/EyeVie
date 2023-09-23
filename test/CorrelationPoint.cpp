@@ -22,6 +22,7 @@ debug(Exporter data)
   //LOG(INFO) << "\n" << svd.matrixU();
   //LOG(INFO) << "\n" << svd.matrixV();
   auto m = svd.matrixV() * svd.matrixU().transpose();
+  (void) m;
   //LOG(INFO) << "\n" << m;
 }
 
