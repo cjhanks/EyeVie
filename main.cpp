@@ -1,5 +1,7 @@
 #include "VoxelGrid.hpp"
 #include "SuperGrid.hpp"
+#include "VoxelContainer.hpp"
+
 
 #include <sys/resource.h>
 #include <sys/time.h>
@@ -34,7 +36,6 @@ using Specification =
       >;
 using VoxelGrid = IV::VoxelGrid<Specification>;
 using SuperGrid = IV::SuperGrid<VoxelGrid>;
-
 
 std::vector<Point>
 GeneratePoints(std::size_t number)
@@ -74,6 +75,8 @@ TestFullyDenseEvenlySampled1()
 {
   Specification specification;
   VoxelGrid grid(specification);
+
+  IV::VoxelContainer<VoxelGrid, int> container(specification);
 
   size_t n = 0;
   for (double i = -double(MaxXcm); i <= double(MaxXcm) ; i += .05)
