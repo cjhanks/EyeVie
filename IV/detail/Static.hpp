@@ -57,7 +57,7 @@ template <
 >
 struct PerformOpHelp<true, Type, void(Args...)> {
   static void
-  Op(Type& type, Args&&... args)
+  Op(Type& type, Args... args)
   { type.operator()(std::forward<Args>(args)...); }
 
 };
@@ -68,7 +68,7 @@ template <
 >
 struct PerformOpHelp<false, Type, void(Args...)> {
   static void
-  Op(Type&, Args&&...)
+  Op(Type&, Args...)
   {}
 };
 
@@ -79,7 +79,7 @@ template <
 struct PerformOp {
   template <typename... Args>
   static void
-  Op(Type& type, Args&&... args)
+  Op(Type& type, Args... args)
   {
     PerformOpHelp<
         HasOp<Type, Signature>::Yes,
