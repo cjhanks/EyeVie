@@ -22,7 +22,7 @@ public:
   }
 
   Point
-  Centroid()
+  Centroid() const
   {
     assert(x.size() > 0);
     assert(y.size() > 0);
@@ -35,10 +35,18 @@ public:
     return point;
   }
 
+  size_t
+  Size() const
+  {
+    assert(x.size() == y.size());
+    assert(y.size() == z.size());
+    return x.size();
+  }
+
 private:
-  RunningAverage<Scalar> x;
-  RunningAverage<Scalar> y;
-  RunningAverage<Scalar> z;
+  detail::RunningAverage<Scalar> x;
+  detail::RunningAverage<Scalar> y;
+  detail::RunningAverage<Scalar> z;
 };
 } // ns IV
 
