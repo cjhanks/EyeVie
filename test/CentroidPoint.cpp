@@ -3,15 +3,13 @@
 #include <type_traits>
 
 #include "CentroidPoint.hpp"
-#include "VoxelGrid.hpp"
+#include "VoxelContainer.hpp"
 
 
 struct Point {
   double x;
   double y;
   double z;
-
-  struct {} data;
 };
 
 TEST(CentroidPoint, Simple2) {
@@ -43,4 +41,28 @@ TEST(CentroidPoint, Simple2) {
     ASSERT_NEAR(c0.Centroid().y, 0, 1e-5);
     ASSERT_NEAR(c0.Centroid().z, 0, 1e-5);
   } while (0);
+}
+
+TEST(CentroidPoint, VoxelContainer) {
+  using Spec = IV::VoxelSpecifications<Point, 10, 10, 10>;
+  using Centroid = IV::CentroidPoint<Spec>;
+  using VoxelContainer = IV::VoxelContainer<Spec, Centroid>;
+
+  VoxelContainer container;
+
+  for (ssize_t i = -10; i <= 10; ++i) {
+    Point pt;
+    pt.x = i;
+    pt.y = i;
+    pt.z = i;
+    container[pt].Update(pt);
+  }
+
+  ASSERT_EQ(container.Size(), 21);
+
+  for (const auto& elem: container) {
+    auto centroid = elem.second.Centroid();
+    ASSERT_NEAR(centroid.x, centroid.y, 1e-5);
+    ASSERT_NEAR(centroid.y, centroid.z, 1e-5);
+  }
 }

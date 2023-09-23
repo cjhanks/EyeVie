@@ -15,11 +15,21 @@ TEST(VoxelGrid, BitsUndefinedIs0) {
   using IndexMapper = IV::VoxelGridIndexMapper<Specification>;
   using VoxelIndex = typename IndexMapper::VoxelIndex;
 
-  LOG(INFO)
-    << VoxelIndex::BitsI << ", "
-    << VoxelIndex::BitsJ << ", "
-    << VoxelIndex::BitsK << ", "
-    << VoxelIndex::BitsUndefined;
+  ASSERT_EQ(3, size_t(VoxelIndex::BitsI));
+  ASSERT_EQ(3, size_t(VoxelIndex::BitsJ));
+  ASSERT_EQ(2, size_t(VoxelIndex::BitsK));
+  ASSERT_EQ(0, size_t(VoxelIndex::BitsUndefined));
+}
+
+TEST(VoxelGrid, BitsUndefinedIsNot0) {
+  using Specification = IV::VoxelSpecifications<Point, 2, 2, 2>;
+  using IndexMapper = IV::VoxelGridIndexMapper<Specification>;
+  using VoxelIndex = typename IndexMapper::VoxelIndex;
+
+  ASSERT_EQ(3, size_t(VoxelIndex::BitsI));
+  ASSERT_EQ(3, size_t(VoxelIndex::BitsJ));
+  ASSERT_EQ(3, size_t(VoxelIndex::BitsK));
+  ASSERT_EQ(7, size_t(VoxelIndex::BitsUndefined));
 }
 
 TEST(VoxelGrid, Mapping) {

@@ -23,6 +23,7 @@ class VoxelContainer {
                     typename VoxelIndex::Hasher>;
 
 public:
+  using Point = typename PointTraits::Point;
   using iterator = typename Map::iterator;
   using const_iterator = typename Map::const_iterator;
 
