@@ -1,6 +1,9 @@
 #ifndef DETAIL_RUNNING_REGRESSION_HPP_
 #define DETAIL_RUNNING_REGRESSION_HPP_
 
+#include <cmath>
+#include <limits>
+#include <glog/logging.h>
 #include "detail/RunningAverage.hpp"
 
 
@@ -43,11 +46,39 @@ public:
   }
 
   Number
+  CovarianceII() const
+  {
+    return std::pow(iRunning.Variance(), 2);
+  }
+
+  Number
+  CovarianceIJ() const
+  {
+    return S_ij / (Size() - 1);
+  }
+
+  Number
+  CovarianceJJ() const
+  {
+    return std::pow(jRunning.Variance(), 2);
+  }
+
+  Number
+  Covariance() const
+  {
+    return CovarianceIJ();
+  }
+
+  Number
   Correlation() const
   {
     auto c = iRunning.StandardDeviation()
            * jRunning.StandardDeviation();
-    return S_ij / ((Size() - 1) * c);
+
+    if (c <= std::numeric_limits<Number>::epsilon())
+      return 0;
+    else
+      return S_ij / ((Size() - 1) * c);
   }
 
 private:

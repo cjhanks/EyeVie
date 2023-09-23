@@ -2,6 +2,8 @@
 #define IV_CORRELATION_CENTROID_HPP_
 
 #include <Eigen/Eigen>
+#include <glog/logging.h>
+
 #include "detail/RunningRegression.hpp"
 
 
@@ -13,6 +15,7 @@ public:
   using PointAccessor = typename Specification::PointAccessor;
   using Number = typename Point::Number;
   using Matrix = Eigen::Matrix<Number, 3, 3>;
+  using Vector = Eigen::Matrix<Number, 3, 1>;
 
   void
   operator()(Point point)
@@ -27,6 +30,32 @@ public:
   }
 
   Matrix
+  CovarianceMatrix() const
+  {
+    // -
+    auto cxx = xy.CovarianceII();
+    auto cxy = xy.CovarianceIJ();
+    auto cxz = xz.CovarianceJJ();
+
+    // -
+    auto cyx = cxy;
+    auto cyy = yz.CovarianceII();
+    auto cyz = yz.CovarianceIJ();
+
+    // -
+    auto czx = cxz;
+    auto czy = cyz;
+    auto czz = yz.CovarianceJJ();
+
+    // =
+    Matrix m;
+    m << cxx, cxy, cxz,
+         cyx, cyy, cyz,
+         czx, czy, czz;
+    return m;
+  }
+
+  Matrix
   CorrelationMatrix() const
   {
     auto cxy = xy.Correlation();
@@ -38,6 +67,14 @@ public:
         cxy,   1,  cyz,
         cxz, cxy,    1;
     return m;
+  }
+
+  std::size_t
+  Size() const
+  {
+    DCHECK_EQ(xy.Size(), xz.Size());
+    DCHECK_EQ(xz.Size(), yz.Size());
+    return xy.Size();
   }
 
 private:
