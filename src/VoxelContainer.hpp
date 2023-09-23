@@ -7,24 +7,16 @@
 
 
 namespace IV {
-template <typename VoxelGrid, typename ValueType>
-class VoxelContainer : public VoxelGrid {
-public:
-  using Specification = typename VoxelGrid::Specification;
-  using SelfType = VoxelContainer<VoxelGrid, ValueType>;
-  using Point = typename Specification::Point;
-  using VoxelIndex = detail::VoxelIndex<Specification::DepthI,
-                                        Specification::DepthJ,
-                                        Specification::DepthK>;
-  using Scalar = typename Specification::Scalar;
-  using VoxelData = detail::VoxelData<Specification>;
-  using VoxelDataPoint = typename VoxelData::DataPoint;
-  using PointVector = typename VoxelData::PointVector;
-  using PointAccessor = detail::PointAccessor<SelfType>;
-  using VoxelNeighborhood = detail::VoxelNeighborhood<SelfType>;
+template <typename Specification_, typename ValueType>
+class VoxelContainer {
+  using Specification = Specification_;
+  using VoxelGridIndexMapper = IV::VoxelGridIndexMapper<Specification>;
+  using VoxelTraits = typename Specification::VoxelTraits;
+  using VoxelIndex = typename VoxelTraits::Index;
 
+  using PointTraits = typename Specification::PointTraits;
+  using Scalar = typename PointTraits::Scalar;
 
-private:
   using Map = std::unordered_map<
                     VoxelIndex,
                     ValueType,
@@ -34,36 +26,34 @@ public:
   using iterator = typename Map::iterator;
   using const_iterator = typename Map::const_iterator;
 
-  using VoxelGrid::VoxelGrid;
-
   // {
   ValueType&
   at(Point point)
-  { return data.at(this->MapPoint(point)); }
+  { return data.at(VoxelGridIndexMapper::MapPoint(point)); }
 
   const ValueType&
   at(Point point) const
-  { return data.at(this->MapPoint(point)); }
+  { return data.at(VoxelGridIndexMapper::MapPoint(point)); }
   // }
 
   // {
   ValueType&
   operator[](Point point)
-  { return data[this->MapPoint(point)]; }
+  { return data[VoxelGridIndexMapper::MapPoint(point)]; }
 
   const ValueType&
   operator[](Point point) const
-  { return data[this->MapPoint(point)]; }
+  { return data[VoxelGridIndexMapper::MapPoint(point)]; }
   // }
 
   //{
   iterator
   find(Point point)
-  { return data.find(this->MapPoint(point)); }
+  { return data.find(VoxelGridIndexMapper::MapPoint(point)); }
 
   const_iterator
   find(Point point) const
-  { return data.find(this->MapPoint(point)); }
+  { return data.find(VoxelGridIndexMapper::MapPoint(point)); }
   //}
 
   // {

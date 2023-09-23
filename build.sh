@@ -1,11 +1,17 @@
 #!/bin/bash
+
 set -e
 
 g++ \
-  -std=c++14 \
-  -O3 \
   -g \
+  -std=c++14 \
   -Wall \
   -Wextra \
   -Isrc \
-  main.cpp
+  test/*.cpp \
+  -lgtest_main \
+  -lgtest \
+  -pthread \
+  -lglog \
+  -o \
+  	gtests

@@ -1,21 +1,41 @@
 #ifndef VOXEL_GRID_HPP_
 #define VOXEL_GRID_HPP_
 
-#include <cstdint>
-#include <cmath>
-#include <unordered_map>
-#include <vector>
-
-#include "detail/VoxelGrid.hpp"
+#include <stdexcept>
+#include <type_traits>
 
 #include "Voxel.hpp"
-#include "VoxelQuery.hpp"
-
-#include <iostream>
 
 
 namespace IV {
-/// {
+template <typename Point_>
+struct PointTraits {
+  using Point = Point_;
+  using Scalar = decltype(((Point*)(nullptr))->x);
+
+  static_assert(
+      std::is_same<decltype(((Point*)(nullptr))->x),
+                   decltype(((Point*)(nullptr))->y)>::value
+   && std::is_same<decltype(((Point*)(nullptr))->y),
+                   decltype(((Point*)(nullptr))->z)>::value,
+    "Mismatched types for point XYZ");
+};
+
+template <
+  std::size_t XWidth,
+  std::size_t YWidth,
+  std::size_t ZWidth
+  >
+struct VoxelTraits {
+  static constexpr std::size_t DepthI = XWidth;
+  static constexpr std::size_t DepthJ = YWidth;
+  static constexpr std::size_t DepthK = ZWidth;
+
+  using Index = detail::VoxelIndex<DepthI, DepthJ, DepthK>;
+};
+
+
+/// @class VoxelSpecifications
 template <
   typename Point_,
   std::size_t XWidth,
@@ -23,138 +43,64 @@ template <
   std::size_t ZWidth
 >
 struct VoxelSpecifications {
-  using Point = Point_;
-  using Scalar = double; // TODO: Derive from Point::x,y,z
-  using Data = decltype(((Point*)(nullptr))->data);
+  using PointTraits = IV::PointTraits<Point_>;
+  using VoxelTraits = IV::VoxelTraits<XWidth, YWidth, ZWidth>;
 
-  static constexpr std::size_t DepthI = XWidth;
-  static constexpr std::size_t DepthJ = YWidth;
-  static constexpr std::size_t DepthK = ZWidth;
-
+  // {
+  // Begin user overloadable types
   static constexpr std::size_t BitsPerPointIndex = 5;
+  // }
 };
-/// }
 
+////////////////////////////////////////////////////////////////////////////////
 
+/// @class VoxelGridIndexMapper
+///
+///
 template <typename Specification_>
-class VoxelGrid {
-public:
-  using SelfType = VoxelGrid<Specification_>;
+class VoxelGridIndexMapper {
   using Specification = Specification_;
-  using Point = typename Specification::Point;
-  using VoxelIndex = detail::VoxelIndex<Specification::DepthI,
-                                        Specification::DepthJ,
-                                        Specification::DepthK>;
-  using Scalar = typename Specification::Scalar;
-  using VoxelData = detail::VoxelData<Specification>;
-  using VoxelDataPoint = typename VoxelData::DataPoint;
-  using PointVector = typename VoxelData::PointVector;
-  using PointAccessor = detail::PointAccessor<SelfType>;
-  using VoxelNeighborhood = detail::VoxelNeighborhood<SelfType>;
+
+public:
+  using PointTraits = typename Specification::PointTraits;
+  using Scalar = typename PointTraits::Scalar;
+  using Point = typename PointTraits::Point;
+
+  using VoxelTraits = typename Specification::VoxelTraits;
+  using VoxelIndex = typename VoxelTraits::Index;
 
 
-  struct PointElement {
-    Scalar x;
-    Scalar y;
-    Scalar z;
-    VoxelData* data = nullptr;
-  };
+  // {
+  // Maps a point to a specific voxel index. If the requested point would
+  // overflow an `out_of_range` error is thrown when NDEBUG is not defined.
+  // If NDEBUG is defined, overflow behavior is undefined.
+  inline static VoxelIndex
+  MapPoint(Point point)
+  { return MapPoint(point.x, point.y, point.z); }
 
-  explicit VoxelGrid(Specification specification)
-    : specification(specification)
-  {}
+  inline static VoxelIndex
+  MapPoint(Scalar x, Scalar y, Scalar z)
+  { return MapPointImpl(x, y, z); }
+  // }
 
-  void
-  AddPoint(Point point)
-  {
-    assert(point.x > -Specification::DepthI
-        && point.x < +Specification::DepthI);
-    assert(point.y > -Specification::DepthJ
-        && point.y < +Specification::DepthJ);
-    assert(point.z > -Specification::DepthK
-        && point.z < +Specification::DepthK);
-
-    auto index = MapPoint(point);
-    data[index].points.emplace_back(
-                        PointGlobalToPointLocal(index, point));
-  }
-
-  PointAccessor
-  at(VoxelIndex index)
-  {
-    auto elem = data.find(index);
-    if (elem == data.end())
-      return PointAccessor();
-    else
-      return PointAccessor(index, &elem->second);
-  }
-
-  VoxelNeighborhood
-  at(VoxelIndex index, std::size_t size)
-  {
-    return VoxelNeighborhood(*this, size);
-  }
-
-  VoxelIndex
-  MapPoint(Point point) const
-  {
-    return MapPoint(point.x, point.y, point.z);
-  }
-
-  VoxelIndex
-  MapPoint(Scalar x, Scalar y, Scalar z) const
-  {
-    return MapPointImpl(x, y, z);
-  }
-
-protected:
-  const Specification specification;
-  std::unordered_map<
-        VoxelIndex,
-        VoxelData,
-        typename VoxelIndex::Hasher> data;
-
-  VoxelIndex
-  MapPointImpl(Scalar x, Scalar y, Scalar z) const
+private:
+  inline static VoxelIndex
+  MapPointImpl(Scalar x, Scalar y, Scalar z)
   {
     auto indexI = std::floor(x);
     auto indexJ = std::floor(y);
     auto indexK = std::floor(z);
 
+#if !defined(NDEBUG)
+    if (std::abs(indexI) > VoxelTraits::DepthI
+     || std::abs(indexJ) > VoxelTraits::DepthJ
+     || std::abs(indexK) > VoxelTraits::DepthK
+     ) {
+      throw std::out_of_range("Mapped point would overflow.");
+    }
+#endif
+
     return VoxelIndex(indexI, indexJ, indexK);
-  }
-
-  static VoxelDataPoint
-  PointGlobalToPointLocal(const VoxelIndex& index, Point point)
-  {
-    assert(point.x >= index.i);
-    assert(point.y >= index.j);
-    assert(point.z >= index.k);
-
-    point.x -= index.i;
-    point.y -= index.j;
-    point.z -= index.k;
-
-    assert(point.x <= 1 && point.x >= 0);
-    assert(point.y <= 1 && point.y >= 0);
-    assert(point.z <= 1 && point.z >= 0);
-
-    return VoxelDataPoint(std::round(point.x * VoxelDataPoint::Scaler),
-                          std::round(point.y * VoxelDataPoint::Scaler),
-                          std::round(point.z * VoxelDataPoint::Scaler),
-                          point.data);
-  }
-
-  static PointElement
-  PointLocalToPointGlobal(const VoxelIndex& index, const VoxelDataPoint& point)
-  {
-    Point pt;
-    pt.x = index.i + (double(point.deltaI) / VoxelDataPoint::Scaler);
-    pt.y = index.j + (double(point.deltaJ) / VoxelDataPoint::Scaler);
-    pt.z = index.k + (double(point.deltaK) / VoxelDataPoint::Scaler);
-    pt.data = &(point.data);
-
-    return pt;
   }
 };
 } // ns IV
