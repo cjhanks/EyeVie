@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <Eigen/Eigen>
 
-#include "MetricSpace.hpp"
+#include "Specification.hpp"
 #include "Point/CorrelationPoint.hpp"
 
 using namespace IV;
@@ -11,10 +11,18 @@ template <typename Exporter>
 void
 debug(Exporter data)
 {
-  Eigen::EigenSolver<Eigen::Matrix3f> solver(data.CovarianceMatrix());
-  LOG(INFO) << data.CovarianceMatrix();
-  LOG(INFO) << solver.eigenvalues().real();
-  LOG(INFO) << solver.eigenvectors().real();
+  //Eigen::EigenSolver<Eigen::Matrix3f> solver(data.CovarianceMatrix());
+  //LOG(INFO) << "\n" << data.CovarianceMatrix();
+  //LOG(INFO) << "\n" << solver.eigenvalues().real();
+  //LOG(INFO) << "\n" << solver.eigenvectors().real();
+
+  auto svd = data.CovarianceMatrix().jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+  //LOG(INFO) << "\n" << svd.singularValues();
+  //LOG(INFO) << "\n" << svd.matrixU();
+  //LOG(INFO) << "\n" << svd.matrixV();
+  auto m = svd.matrixV() * svd.matrixU().transpose();
+  //LOG(INFO) << "\n" << m;
 }
 
 TEST(CorrelationPoint, Test0) {
@@ -25,8 +33,8 @@ TEST(CorrelationPoint, Test0) {
 
   for (size_t j = 0; j < 10; ++j) {
     Point point;
-    point.x = 0;
-    point.y = j;
+    point.x = j;
+    point.y = 0;
     point.z = 0;
 
     crossCorrelation(point);
@@ -42,10 +50,28 @@ TEST(CorrelationPoint, Test1) {
 
   IV::CorrelationPoint<Specification> crossCorrelation;
 
-  for (size_t i = 0; i < 10; ++i)
-  for (size_t j = 0; j < 10; ++j) {
+  for (ssize_t i = 0; i < 10; ++i)
+  for (ssize_t j = 0; j < 10; ++j) {
     Point point;
     point.x = i;
+    point.y = j;
+    point.z = i + j;
+
+    crossCorrelation(point);
+  }
+
+  debug(crossCorrelation);
+}
+
+TEST(CorrelationPoint, Test2) {
+  using Specification = IV::Specification;
+  using Point = typename Specification::Point;
+
+  IV::CorrelationPoint<Specification> crossCorrelation;
+
+  for (size_t j = 0; j < 10; ++j) {
+    Point point;
+    point.x = j;
     point.y = j;
     point.z = 0;
 
@@ -54,6 +80,7 @@ TEST(CorrelationPoint, Test1) {
 
   debug(crossCorrelation);
 }
+
 
 #if 0
 TEST(CorrelationPoint, Test2) {
@@ -136,6 +163,7 @@ TEST(CorrelationPoint, Test3) {
 
   LOG(INFO) << crossCorrelation.CovarianceMatrix();
 }
+#endif
 
 
 TEST(CorrelationPoint, Test4) {
@@ -147,15 +175,35 @@ TEST(CorrelationPoint, Test4) {
   // draw dense sphere
   for (double t = -M_PI; t < +M_PI; t += .1)
   for (double p = -M_PI; p < +M_PI; p += .1)
-  for (double r = 0; r < 1; r += .25) {
+  for (double r = 0; r < 1; r += .05) {
     Point point;
     point.x = r * std::sin(p) * std::cos(t);
     point.y = r * std::sin(p) * std::sin(t);
-    point.z = r * std::cos(t);
+    point.z = r * std::cos(p);
 
     crossCorrelation(point);
   }
 
-  LOG(INFO) << crossCorrelation.CovarianceMatrix();
+  debug(crossCorrelation);
 }
-#endif
+
+TEST(CorrelationPoint, Test5) {
+  using Specification = IV::Specification;
+  using Point = typename Specification::Point;
+
+  IV::CorrelationPoint<Specification> crossCorrelation;
+
+  // draw dense sphere
+  for (double t = -0; t < +M_PI; t += .1)
+  for (double p = -0; p < +M_PI; p += .1)
+  for (double r = 0; r < 1; r += .05) {
+    Point point;
+    point.x = r * std::sin(p) * std::cos(t);
+    point.y = r * std::sin(p) * std::sin(t);
+    point.z = r * std::cos(p);
+
+    crossCorrelation(point);
+  }
+
+  debug(crossCorrelation);
+}
