@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cstdint>
 
-#include "ByteManipulation.hpp"
+#include "detail/ByteManipulation.hpp"
 
 
 namespace IV { namespace detail {
@@ -31,10 +31,14 @@ struct IJK_Bits {
     , undefined(0)
   {}
 
-  long i:BitsI;
-  long j:BitsJ;
-  long k:BitsK;
-  long undefined:BitsUndefined;
+  long long i:BitsI;
+  long long j:BitsJ;
+  long long k:BitsK;
+  long long undefined:BitsUndefined;
+
+  using BitsTypeI = decltype(i);
+  using BitsTypeJ = decltype(j);
+  using BitsTypeK = decltype(k);
 };
 
 template <
@@ -49,9 +53,13 @@ struct IJK_Bits<BitsI, BitsJ, BitsK, 0> {
     , k(k)
   {}
 
-  long i:BitsI;
-  long j:BitsJ;
-  long k:BitsK;
+  long long i:BitsI;
+  long long j:BitsJ;
+  long long k:BitsK;
+
+  using BitsTypeI = decltype(i);
+  using BitsTypeJ = decltype(j);
+  using BitsTypeK = decltype(k);
 };
 /// }
 

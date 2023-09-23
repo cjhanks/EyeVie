@@ -46,7 +46,8 @@ TEST(CentroidPoint, Simple2) {
 TEST(CentroidPoint, VoxelContainer) {
   using Spec = IV::VoxelSpecifications<Point, 10, 10, 10>;
   using Centroid = IV::CentroidPoint<Spec>;
-  using VoxelContainer = IV::VoxelContainer<Spec, Centroid>;
+  using GridMapper = IV::VoxelGridIndexMapper<Spec>;
+  using VoxelContainer = IV::VoxelContainer<GridMapper, Centroid>;
 
   VoxelContainer container;
 

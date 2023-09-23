@@ -2,7 +2,7 @@
 #include <type_traits>
 
 
-#include "ByteManipulation.hpp"
+#include "detail/ByteManipulation.hpp"
 
 
 using std::vector;

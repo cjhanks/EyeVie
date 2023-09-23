@@ -63,9 +63,17 @@ template <>
 struct TypeFor_<4> { using type = std::uint32_t; };
 template <>
 struct TypeFor_<8> { using type = std::uint64_t; };
-#if 0
+#if UINT128_DEFINED
+#if __GNUC__
+using uint128_t = __uint128_t;
+
 template <>
-struct TypeFor_<16> { using type = std::uint128_t; };
+struct TypeFor_<16> { using type = uint128_t; };
+#else
+
+#endif
+
+
 #endif
 /// }
 

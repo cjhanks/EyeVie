@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "../ByteManipulation.hpp"
+#include "ByteManipulation.hpp"
 
 
 namespace IV { namespace detail {
